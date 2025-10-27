@@ -1,5 +1,7 @@
-torch>=1.10
-torchvision
+--extra-index-url https://download.pytorch.org/whl/cu129
+
+torch==2.8.0
+torchvision==0.23.0
 albumentations>=1.1.0
 torchinfo
 tqdm

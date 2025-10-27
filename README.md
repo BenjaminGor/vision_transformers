@@ -33,7 +33,7 @@
 * [Examples](#Examples)
 
 
-## Quick Setup
+## Quick Setup (Installation from source recommended)
 
 ### Stable PyPi Package
 
@@ -43,7 +43,7 @@ pip install vision-transformers
 
 ### OR
 
-### Latest Git Updates
+### Latest Git Updates from Source
 
 ```bash
 git clone https://github.com/sovit-123/vision_transformers.git
@@ -51,6 +51,20 @@ cd vision_transformers
 ```
 
 Installation in the environment of your choice:
+
+* Install requirements on **RTX 30/40** (**Ampere and Ada Lovelace**) series and **T4/P100 GPUs**.
+
+```
+pip install -r requirements.txt
+```
+
+* **OR** install requirements for **RTX 50** series and **Blackwell GPUs**. First install PyTorch >= 2.8 with CUDA >= 12.9
+
+```
+pip install -r requirements_blackwell.txt
+```
+
+**Finally,** install the package.
 
 ```bash
 pip install .
@@ -81,18 +95,7 @@ model = swin_transformer.swin_t_p4_w7_224(num_classes=1000, pretrained=True)
 
 ### If you want to use the training pipeline
 
-* Clone the repository:
-
-```bash
-git clone https://github.com/sovit-123/vision_transformers.git
-cd vision_transformers
-```
-
-* Install
-
-```bash
-pip install .
-```
+* Clone the repository, install the requirements, and the library from source.
 
 From the `vision_transformers` directory:
 
