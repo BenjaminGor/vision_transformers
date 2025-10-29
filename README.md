@@ -1,5 +1,7 @@
 # vision_transformers
 
+![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
+
 ***A repository for everything Vision Transformers.***
 
 ![](readme_images/detr_infer.gif)
