@@ -35,7 +35,7 @@ def parse_opt():
     parser.add_argument(
         '-e', 
         '--epochs',
-        default=10,
+        default=20,
         type=int
     )
     parser.add_argument(
@@ -131,7 +131,7 @@ def parse_opt():
     )
     parser.add_argument(
         '--eos_coef',
-        default=0.1,
+        default=0.2, # 0.1
         type=float,
         help='relative classification weight of the no-object class'
     )
@@ -188,7 +188,7 @@ def main(args):
         CLASSES,
         use_train_aug=args.use_train_aug,
         mosaic=args.mosaic,
-        square_training=True
+        square_training=False #True
     )
 
     valid_dataset = create_valid_dataset(
@@ -196,7 +196,7 @@ def main(args):
         VALID_DIR_LABELS, 
         IMAGE_SIZE, 
         CLASSES,
-        square_training=True
+        square_training=False #True
     )
 
     if IS_DISTRIBUTED:
@@ -235,7 +235,7 @@ def main(args):
         torchinfo.summary(
             model, 
             device=DEVICE, 
-            input_size=(BATCH_SIZE, 3, IMAGE_SIZE, IMAGE_SIZE),
+            input_size=(BATCH_SIZE, 3, IMAGE_SIZE//2, IMAGE_SIZE), # Edited
             row_settings=["var_names"],
             col_names=["input_size", "output_size", "num_params"],
         )

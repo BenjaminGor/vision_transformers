@@ -40,7 +40,8 @@ class DETRDataset(Dataset):
         self.mosaic = mosaic
         self.square_training = square_training
         self.mosaic_border = [-img_size // 2, -img_size // 2]
-        self.image_file_types = ['*.jpg', '*.jpeg', '*.png', '*.ppm', '*.JPG']
+        #self.image_file_types = ['*.jpg', '*.jpeg', '*.png', '*.ppm', '*.JPG']
+        self.image_file_types = ['*.npy']
         self.all_image_paths = []
         
         # get all the image paths in sorted order
@@ -78,11 +79,12 @@ class DETRDataset(Dataset):
         image_path = os.path.join(self.images_path, image_name)
 
         # Read the image.
-        image = cv2.imread(image_path)
+        #image = cv2.imread(image_path)
+        image = np.load(image_path)
         # Convert BGR to RGB color format.
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
+        #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
         image_resized = self.resize(image, square=self.square_training)
-        image_resized /= 255.0
+        #image_resized /= 255.0
         
         # Capture the corresponding XML file for getting the annotations.
         annot_filename = os.path.splitext(image_name)[0] + '.xml'
@@ -156,7 +158,8 @@ class DETRDataset(Dataset):
         boxes_length = len(boxes)
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
         # Area of the bounding boxes.
-        area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0]) if boxes_length > 0 else torch.as_tensor(boxes, dtype=torch.float32)
+        #area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0]) if boxes_length > 0 else torch.as_tensor(boxes, dtype=torch.float32)
+        area = boxes[:, 3] * boxes[:, 2] if boxes_length > 0 else torch.as_tensor(boxes, dtype=torch.float32)
         # No crowd instances.
         iscrowd = torch.zeros((boxes.shape[0],), dtype=torch.int64) if boxes_length > 0 else torch.as_tensor(boxes, dtype=torch.float32)
         # Labels to tensor.
@@ -286,6 +289,7 @@ class DETRDataset(Dataset):
                 labels, area, iscrowd, dims = self.load_image_and_labels(
                 index=idx
             )
+            boxes = boxes.numpy()
 
         if self.train:
             mosaic_prob = random.uniform(0.0, 1.0)
@@ -299,6 +303,7 @@ class DETRDataset(Dataset):
                     labels, area, iscrowd, dims = self.load_image_and_labels(
                     index=idx
                 )
+                boxes = boxes.numpy()
 
         # Prepare the final `target` dictionary.
         target = {}
@@ -313,19 +318,19 @@ class DETRDataset(Dataset):
             train_aug = get_train_aug()
             sample = train_aug(image=image_resized,
                                      bboxes=target['boxes'],
-                                     labels=labels)
+                                     labels=labels.numpy())
             image_resized = sample['image']
             # target['boxes'] = torch.Tensor(sample['bboxes']).to(torch.float)
         else:
             sample = self.transforms(image=image_resized,
                                      bboxes=target['boxes'],
-                                     labels=labels)
+                                     labels=labels.numpy())
             image_resized = sample['image']
             # target['boxes'] = torch.Tensor(sample['bboxes']).to(torch.float)
 
         _, h, w = image_resized.shape
         target["orig_size"] = torch.as_tensor([int(h), int(w)])
-        boxes = A.core.bbox_utils.normalize_bboxes(sample['bboxes'], rows=h, cols=w)
+        boxes = A.core.bbox_utils.normalize_bboxes(sample['bboxes'], shape=(h,w))
         boxes = np.array(boxes)
         # Try-except block in case an image does not contains target boxes.
         try:
